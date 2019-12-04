@@ -4463,6 +4463,25 @@ var $elm$core$List$append = F2(
 var $elm$core$List$concat = function (lists) {
 	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
 };
+var $elm$core$List$map = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, acc) {
+					return A2(
+						$elm$core$List$cons,
+						f(x),
+						acc);
+				}),
+			_List_Nil,
+			xs);
+	});
+var $elm$core$List$concatMap = F2(
+	function (f, list) {
+		return $elm$core$List$concat(
+			A2($elm$core$List$map, f, list));
+	});
 var $elm$core$List$filter = F2(
 	function (isGood, list) {
 		return A3(
@@ -4481,6 +4500,9 @@ var $author$project$Day4$hasTwoConsecutiveNumbersStep2 = function (number) {
 var $elm$core$Basics$ge = _Utils_ge;
 var $author$project$Day4$highNumber = 789860;
 var $author$project$Day4$lowNumber = 254032;
+var $author$project$Day4$numberToInt = function (number) {
+	return (((((number.one * 100000) + (number.two * 10000)) + (number.three * 1000)) + (number.four * 100)) + (number.five * 10)) + number.six;
+};
 var $author$project$Day4$isInRange = F2(
 	function (numberLow, accessors) {
 		var numberHigh = A3(
@@ -4492,23 +4514,9 @@ var $author$project$Day4$isInRange = F2(
 				}),
 			numberLow,
 			accessors);
-		var lowBound = (((((numberLow.one * 100000) + (numberLow.two * 10000)) + (numberLow.three * 1000)) + (numberLow.four * 100)) + (numberLow.five * 10)) + numberLow.six;
-		var highBound = (((((numberHigh.one * 100000) + (numberHigh.two * 10000)) + (numberHigh.three * 1000)) + (numberHigh.four * 100)) + (numberHigh.five * 10)) + numberHigh.six;
+		var lowBound = $author$project$Day4$numberToInt(numberLow);
+		var highBound = $author$project$Day4$numberToInt(numberHigh);
 		return (_Utils_cmp(highBound, $author$project$Day4$lowNumber) > -1) && (_Utils_cmp(lowBound, $author$project$Day4$highNumber) < 1);
-	});
-var $elm$core$List$map = F2(
-	function (f, xs) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, acc) {
-					return A2(
-						$elm$core$List$cons,
-						f(x),
-						acc);
-				}),
-			_List_Nil,
-			xs);
 	});
 var $author$project$Day4$iterate = F4(
 	function (_v0, remainingNumbers, previousUnit, currentNumber) {
@@ -4520,18 +4528,17 @@ var $author$project$Day4$iterate = F4(
 			} else {
 				var next = remainingNumbers.a;
 				var remaining = remainingNumbers.b;
-				return $elm$core$List$concat(
-					A2(
-						$elm$core$List$map,
-						function (number) {
-							return A4(
-								$author$project$Day4$iterate,
-								next,
-								remaining,
-								nextNumberGetter(number),
-								number);
-						},
-						numbersToExplore));
+				return A2(
+					$elm$core$List$concatMap,
+					function (number) {
+						return A4(
+							$author$project$Day4$iterate,
+							next,
+							remaining,
+							nextNumberGetter(number),
+							number);
+					},
+					numbersToExplore);
 			}
 		}(
 			A2(

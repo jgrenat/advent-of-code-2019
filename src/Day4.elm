@@ -36,8 +36,7 @@ iterate ( nextNumberGetter, nextNumberSetter ) remainingNumbers previousUnit cur
                         List.filter hasTwoConsecutiveNumbersStep2 numbersToExplore
 
                     next :: remaining ->
-                        List.map (\number -> iterate next remaining (nextNumberGetter number) number) numbersToExplore
-                            |> List.concat
+                        List.concatMap (\number -> iterate next remaining (nextNumberGetter number) number) numbersToExplore
            )
 
 
@@ -48,10 +47,10 @@ isInRange numberLow accessors =
             List.foldl (\( _, setter ) high -> setter high 9) numberLow accessors
 
         lowBound =
-            numberLow.one * 100000 + numberLow.two * 10000 + numberLow.three * 1000 + numberLow.four * 100 + numberLow.five * 10 + numberLow.six
+            numberToInt numberLow
 
         highBound =
-            numberHigh.one * 100000 + numberHigh.two * 10000 + numberHigh.three * 1000 + numberHigh.four * 100 + numberHigh.five * 10 + numberHigh.six
+            numberToInt numberHigh
     in
     highBound >= lowNumber && lowBound <= highNumber
 
@@ -84,6 +83,11 @@ main =
         |> List.length
         |> String.fromInt
         |> text
+
+
+numberToInt : Number -> Int
+numberToInt number =
+    number.one * 100000 + number.two * 10000 + number.three * 1000 + number.four * 100 + number.five * 10 + number.six
 
 
 oneAccessors : ( NumberGetter, NumberSetter )
