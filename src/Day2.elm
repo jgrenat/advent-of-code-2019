@@ -60,6 +60,7 @@ iterate index list =
                         Maybe.map3 (Instruction code) firstMaybe secondMaybe thirdMaybe
                 )
                 codeMaybe
+                |> Maybe.map (Debug.log "instruction")
     in
     instruction
         |> Maybe.map
@@ -102,7 +103,7 @@ tryWith values ( noun, verb ) =
 -- part 2
 
 
-main =
+main2 =
     let
         list =
             parse input
@@ -117,7 +118,7 @@ main =
 -- part 1
 
 
-mainPart1 =
+main =
     parse input
         |> Array.set 1 12
         |> Array.set 2 2
