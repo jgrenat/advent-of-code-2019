@@ -44,11 +44,6 @@ type Instruction
     | HaltInstruction
 
 
-expectedOutput : Int
-expectedOutput =
-    19690720
-
-
 type Mode
     = Immediate
     | Position
@@ -73,10 +68,10 @@ getOpcode instruction =
             modBy 100 instruction
 
         mode1 =
-            Debug.log "opcode1" instruction // 100 |> modBy 10 |> intToMode
+            instruction // 100 |> modBy 10 |> intToMode
 
         mode2 =
-            Debug.log "opcode2" instruction // 1000 |> modBy 10 |> intToMode
+            instruction // 1000 |> modBy 10 |> intToMode
     in
     case opcodeValue of
         1 ->
@@ -137,12 +132,82 @@ modeToValue list mode parameter =
 iterate : Int -> Int -> Array Int -> Array Int
 iterate givenInput index list =
     let
-        _ =
-            Debug.log "list" list
-
         codeMaybe =
             Array.get index list
 
+        instructionMaybe =
+            Maybe.map getOpcode codeMaybe
+                |> Maybe.andThen (getInstruction index list)
+    in
+    case instructionMaybe of
+        Just instruction ->
+            case instruction of
+                AddInstruction first second position ->
+                    Array.set position (first + second) list
+                        |> iterate givenInput (index + 4)
+
+                MultiplyInstruction first second position ->
+                    Array.set position (first * second) list
+                        |> iterate givenInput (index + 4)
+
+                HaltInstruction ->
+                    list
+
+                InputInstruction position ->
+                    Array.set position givenInput list
+                        |> iterate givenInput (index + 2)
+
+                OutputInstruction value ->
+                    let
+                        _ =
+                            Debug.log "Output: " value
+                    in
+                    iterate givenInput (index + 2) list
+
+                JumpIfTrueInstruction value position ->
+                    if value /= 0 then
+                        iterate givenInput position list
+
+                    else
+                        iterate givenInput (index + 3) list
+
+                JumpIfFalseInstruction value position ->
+                    if value == 0 then
+                        iterate givenInput position list
+
+                    else
+                        iterate givenInput (index + 3) list
+
+                LessThanInstruction value1 value2 position ->
+                    let
+                        result =
+                            if value1 < value2 then
+                                1
+
+                            else
+                                0
+                    in
+                    Array.set position result list
+                        |> iterate givenInput (index + 4)
+
+                EqualsInstruction value1 value2 position ->
+                    let
+                        result =
+                            if value1 == value2 then
+                                1
+
+                            else
+                                0
+                    in
+                    Array.set position result list
+                        |> iterate givenInput (index + 4)
+
+        Nothing ->
+            list
+
+
+getInstruction index list opcode =
+    let
         firstMaybe =
             Array.get (index + 1) list
 
@@ -154,106 +219,31 @@ iterate givenInput index list =
 
         toValue mode =
             Maybe.map (modeToValue list mode)
-
-        instructionMaybe =
-            codeMaybe
-                |> Maybe.map getOpcode
-                |> Maybe.map (Debug.log "opcode")
-                |> Maybe.andThen
-                    (\opCode ->
-                        (case opCode of
-                            Add mode1 mode2 ->
-                                Maybe.map3 AddInstruction (toValue mode1 firstMaybe) (toValue mode2 secondMaybe) thirdMaybe
-
-                            Multiply mode1 mode2 ->
-                                Maybe.map3 MultiplyInstruction (toValue mode1 firstMaybe) (toValue mode2 secondMaybe) thirdMaybe
-
-                            Halt ->
-                                Just HaltInstruction
-
-                            Input ->
-                                Maybe.map InputInstruction firstMaybe
-
-                            Output mode ->
-                                Maybe.map OutputInstruction (toValue mode firstMaybe)
-
-                            JumpIfTrue mode1 mode2 ->
-                                Maybe.map2 JumpIfTrueInstruction (toValue mode1 firstMaybe) (toValue mode2 secondMaybe)
-
-                            JumpIfFalse mode1 mode2 ->
-                                Maybe.map2 JumpIfFalseInstruction (toValue mode1 firstMaybe) (toValue mode2 secondMaybe)
-
-                            LessThan mode1 mode2 ->
-                                Maybe.map3 LessThanInstruction (toValue mode1 firstMaybe) (toValue mode2 secondMaybe) thirdMaybe
-
-                            Equals mode1 mode2 ->
-                                Maybe.map3 EqualsInstruction (toValue mode1 firstMaybe) (toValue mode2 secondMaybe) thirdMaybe
-                        )
-                            |> Debug.log "instruction"
-                    )
     in
-    instructionMaybe
-        |> Maybe.map
-            (\instruction ->
-                case instruction of
-                    AddInstruction first second position ->
-                        Array.set position (first + second) list
-                            |> iterate givenInput (index + 4)
+    case opcode of
+        Add mode1 mode2 ->
+            Maybe.map3 AddInstruction (toValue mode1 firstMaybe) (toValue mode2 secondMaybe) thirdMaybe
 
-                    MultiplyInstruction first second position ->
-                        Array.set position (first * second) list
-                            |> iterate givenInput (index + 4)
+        Multiply mode1 mode2 ->
+            Maybe.map3 MultiplyInstruction (toValue mode1 firstMaybe) (toValue mode2 secondMaybe) thirdMaybe
 
-                    HaltInstruction ->
-                        list
+        Halt ->
+            Just HaltInstruction
 
-                    InputInstruction position ->
-                        Array.set position givenInput list
-                            |> iterate givenInput (index + 2)
+        Input ->
+            Maybe.map InputInstruction firstMaybe
 
-                    OutputInstruction value ->
-                        let
-                            _ =
-                                Debug.log "Output: " value
-                        in
-                        iterate givenInput (index + 2) list
+        Output mode ->
+            Maybe.map OutputInstruction (toValue mode firstMaybe)
 
-                    JumpIfTrueInstruction value position ->
-                        if value /= 0 then
-                            iterate givenInput position list
+        JumpIfTrue mode1 mode2 ->
+            Maybe.map2 JumpIfTrueInstruction (toValue mode1 firstMaybe) (toValue mode2 secondMaybe)
 
-                        else
-                            iterate givenInput (index + 3) list
+        JumpIfFalse mode1 mode2 ->
+            Maybe.map2 JumpIfFalseInstruction (toValue mode1 firstMaybe) (toValue mode2 secondMaybe)
 
-                    JumpIfFalseInstruction value position ->
-                        if value == 0 then
-                            iterate givenInput position list
+        LessThan mode1 mode2 ->
+            Maybe.map3 LessThanInstruction (toValue mode1 firstMaybe) (toValue mode2 secondMaybe) thirdMaybe
 
-                        else
-                            iterate givenInput (index + 3) list
-
-                    LessThanInstruction value1 value2 position ->
-                        let
-                            result =
-                                if value1 < value2 then
-                                    1
-
-                                else
-                                    0
-                        in
-                        Array.set position result list
-                            |> iterate givenInput (index + 4)
-
-                    EqualsInstruction value1 value2 position ->
-                        let
-                            result =
-                                if value1 == value2 then
-                                    1
-
-                                else
-                                    0
-                        in
-                        Array.set position result list
-                            |> iterate givenInput (index + 4)
-            )
-        |> Maybe.withDefault list
+        Equals mode1 mode2 ->
+            Maybe.map3 EqualsInstruction (toValue mode1 firstMaybe) (toValue mode2 secondMaybe) thirdMaybe
