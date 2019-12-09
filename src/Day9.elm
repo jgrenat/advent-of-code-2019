@@ -272,30 +272,16 @@ getInstruction relativeBase index list opcode =
     in
     case opcode of
         Add mode1 mode2 mode3 ->
-            let
-                value1 =
-                    toValue relativeBase mode1 firstMaybe
-
-                value2 =
-                    toValue relativeBase mode2 secondMaybe
-
-                position =
-                    positionToValue relativeBase mode3 thirdMaybe
-            in
-            AddInstruction value1 value2 position
+            AddInstruction
+                (toValue relativeBase mode1 firstMaybe)
+                (toValue relativeBase mode2 secondMaybe)
+                (positionToValue relativeBase mode3 thirdMaybe)
 
         Multiply mode1 mode2 mode3 ->
-            let
-                value1 =
-                    toValue relativeBase mode1 firstMaybe
-
-                value2 =
-                    toValue relativeBase mode2 secondMaybe
-
-                position =
-                    positionToValue relativeBase mode3 thirdMaybe
-            in
-            MultiplyInstruction value1 value2 position
+            MultiplyInstruction
+                (toValue relativeBase mode1 firstMaybe)
+                (toValue relativeBase mode2 secondMaybe)
+                (positionToValue relativeBase mode3 thirdMaybe)
 
         Halt ->
             HaltInstruction
