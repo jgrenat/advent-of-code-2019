@@ -1,13 +1,13 @@
-module Day5 exposing (..)
+module Day9 exposing (..)
 
-import Array exposing (Array)
+import Dict exposing (Dict)
 import Html exposing (text)
 import String.Extra as String
 
 
 input : String
 input =
-    """3,225,1,225,6,6,1100,1,238,225,104,0,1101,65,73,225,1101,37,7,225,1101,42,58,225,1102,62,44,224,101,-2728,224,224,4,224,102,8,223,223,101,6,224,224,1,223,224,223,1,69,126,224,101,-92,224,224,4,224,1002,223,8,223,101,7,224,224,1,223,224,223,1102,41,84,225,1001,22,92,224,101,-150,224,224,4,224,102,8,223,223,101,3,224,224,1,224,223,223,1101,80,65,225,1101,32,13,224,101,-45,224,224,4,224,102,8,223,223,101,1,224,224,1,224,223,223,1101,21,18,225,1102,5,51,225,2,17,14,224,1001,224,-2701,224,4,224,1002,223,8,223,101,4,224,224,1,223,224,223,101,68,95,224,101,-148,224,224,4,224,1002,223,8,223,101,1,224,224,1,223,224,223,1102,12,22,225,102,58,173,224,1001,224,-696,224,4,224,1002,223,8,223,1001,224,6,224,1,223,224,223,1002,121,62,224,1001,224,-1302,224,4,224,1002,223,8,223,101,4,224,224,1,223,224,223,4,223,99,0,0,0,677,0,0,0,0,0,0,0,0,0,0,0,1105,0,99999,1105,227,247,1105,1,99999,1005,227,99999,1005,0,256,1105,1,99999,1106,227,99999,1106,0,265,1105,1,99999,1006,0,99999,1006,227,274,1105,1,99999,1105,1,280,1105,1,99999,1,225,225,225,1101,294,0,0,105,1,0,1105,1,99999,1106,0,300,1105,1,99999,1,225,225,225,1101,314,0,0,106,0,0,1105,1,99999,1008,226,677,224,102,2,223,223,1005,224,329,1001,223,1,223,7,677,226,224,102,2,223,223,1006,224,344,1001,223,1,223,1007,226,677,224,1002,223,2,223,1006,224,359,1001,223,1,223,1007,677,677,224,102,2,223,223,1005,224,374,1001,223,1,223,108,677,677,224,102,2,223,223,1006,224,389,101,1,223,223,8,226,677,224,102,2,223,223,1005,224,404,101,1,223,223,7,226,677,224,1002,223,2,223,1005,224,419,101,1,223,223,8,677,226,224,1002,223,2,223,1005,224,434,101,1,223,223,107,677,677,224,1002,223,2,223,1006,224,449,101,1,223,223,7,677,677,224,1002,223,2,223,1006,224,464,101,1,223,223,1107,226,226,224,102,2,223,223,1006,224,479,1001,223,1,223,1007,226,226,224,102,2,223,223,1006,224,494,101,1,223,223,108,226,677,224,1002,223,2,223,1006,224,509,101,1,223,223,1108,226,677,224,102,2,223,223,1006,224,524,1001,223,1,223,1008,226,226,224,1002,223,2,223,1005,224,539,101,1,223,223,107,226,226,224,102,2,223,223,1006,224,554,101,1,223,223,8,677,677,224,102,2,223,223,1005,224,569,101,1,223,223,107,226,677,224,102,2,223,223,1005,224,584,101,1,223,223,1108,226,226,224,1002,223,2,223,1005,224,599,1001,223,1,223,1008,677,677,224,1002,223,2,223,1005,224,614,101,1,223,223,1107,226,677,224,102,2,223,223,1005,224,629,101,1,223,223,1108,677,226,224,1002,223,2,223,1005,224,644,1001,223,1,223,1107,677,226,224,1002,223,2,223,1006,224,659,1001,223,1,223,108,226,226,224,102,2,223,223,1006,224,674,101,1,223,223,4,223,99,226"""
+    """1102,34463338,34463338,63,1007,63,34463338,63,1005,63,53,1101,0,3,1000,109,988,209,12,9,1000,209,6,209,3,203,0,1008,1000,1,63,1005,63,65,1008,1000,2,63,1005,63,904,1008,1000,0,63,1005,63,58,4,25,104,0,99,4,0,104,0,99,4,17,104,0,99,0,0,1102,1,24,1017,1101,0,36,1006,1101,0,30,1011,1101,26,0,1018,1101,32,0,1015,1101,34,0,1004,1101,0,37,1002,1101,25,0,1012,1102,38,1,1010,1101,29,0,1019,1101,308,0,1029,1102,1,696,1027,1102,1,429,1022,1102,1,21,1005,1102,1,33,1013,1101,39,0,1008,1102,20,1,1009,1101,0,652,1025,1102,313,1,1028,1101,0,31,1003,1102,661,1,1024,1101,35,0,1016,1101,0,23,1000,1102,28,1,1014,1102,0,1,1020,1102,27,1,1007,1101,0,1,1021,1102,22,1,1001,1101,703,0,1026,1101,0,422,1023,109,-5,2101,0,9,63,1008,63,31,63,1005,63,205,1001,64,1,64,1105,1,207,4,187,1002,64,2,64,109,6,2102,1,3,63,1008,63,37,63,1005,63,227,1105,1,233,4,213,1001,64,1,64,1002,64,2,64,109,11,21108,40,40,3,1005,1015,255,4,239,1001,64,1,64,1106,0,255,1002,64,2,64,109,-3,21107,41,40,2,1005,1011,275,1001,64,1,64,1105,1,277,4,261,1002,64,2,64,109,4,2107,28,-6,63,1005,63,297,1001,64,1,64,1106,0,299,4,283,1002,64,2,64,109,15,2106,0,0,4,305,1106,0,317,1001,64,1,64,1002,64,2,64,109,-23,2108,22,4,63,1005,63,337,1001,64,1,64,1105,1,339,4,323,1002,64,2,64,109,6,21101,42,0,0,1008,1011,40,63,1005,63,363,1001,64,1,64,1105,1,365,4,345,1002,64,2,64,109,-17,1207,7,21,63,1005,63,381,1105,1,387,4,371,1001,64,1,64,1002,64,2,64,109,14,1201,-1,0,63,1008,63,25,63,1005,63,407,1105,1,413,4,393,1001,64,1,64,1002,64,2,64,109,15,2105,1,0,1001,64,1,64,1105,1,431,4,419,1002,64,2,64,109,-23,2101,0,6,63,1008,63,36,63,1005,63,453,4,437,1106,0,457,1001,64,1,64,1002,64,2,64,109,10,2108,21,-5,63,1005,63,475,4,463,1106,0,479,1001,64,1,64,1002,64,2,64,109,-3,1201,2,0,63,1008,63,20,63,1005,63,505,4,485,1001,64,1,64,1105,1,505,1002,64,2,64,109,4,2107,35,-5,63,1005,63,527,4,511,1001,64,1,64,1105,1,527,1002,64,2,64,109,15,1206,-5,543,1001,64,1,64,1105,1,545,4,533,1002,64,2,64,109,-8,1205,3,563,4,551,1001,64,1,64,1106,0,563,1002,64,2,64,109,-5,1206,7,581,4,569,1001,64,1,64,1105,1,581,1002,64,2,64,109,-8,1207,-3,38,63,1005,63,599,4,587,1105,1,603,1001,64,1,64,1002,64,2,64,109,19,1205,-4,619,1001,64,1,64,1105,1,621,4,609,1002,64,2,64,109,-13,1208,-4,27,63,1005,63,639,4,627,1105,1,643,1001,64,1,64,1002,64,2,64,109,5,2105,1,8,4,649,1001,64,1,64,1106,0,661,1002,64,2,64,109,-16,1202,4,1,63,1008,63,34,63,1005,63,683,4,667,1106,0,687,1001,64,1,64,1002,64,2,64,109,26,2106,0,1,1001,64,1,64,1105,1,705,4,693,1002,64,2,64,109,-9,21102,43,1,-7,1008,1010,46,63,1005,63,725,1105,1,731,4,711,1001,64,1,64,1002,64,2,64,109,-26,1202,9,1,63,1008,63,26,63,1005,63,755,1001,64,1,64,1105,1,757,4,737,1002,64,2,64,109,34,21108,44,43,-8,1005,1017,773,1106,0,779,4,763,1001,64,1,64,1002,64,2,64,109,-15,21102,45,1,1,1008,1011,45,63,1005,63,801,4,785,1106,0,805,1001,64,1,64,1002,64,2,64,109,-14,1208,10,35,63,1005,63,821,1106,0,827,4,811,1001,64,1,64,1002,64,2,64,109,17,2102,1,-4,63,1008,63,20,63,1005,63,853,4,833,1001,64,1,64,1106,0,853,1002,64,2,64,109,6,21107,46,47,-4,1005,1015,871,4,859,1105,1,875,1001,64,1,64,1002,64,2,64,109,-10,21101,47,0,4,1008,1013,47,63,1005,63,901,4,881,1001,64,1,64,1105,1,901,4,64,99,21102,27,1,1,21102,1,915,0,1106,0,922,21201,1,37790,1,204,1,99,109,3,1207,-2,3,63,1005,63,964,21201,-2,-1,1,21102,1,942,0,1106,0,922,22102,1,1,-1,21201,-2,-3,1,21102,957,1,0,1105,1,922,22201,1,-1,-2,1105,1,968,21201,-2,0,-2,109,-3,2105,1,0"""
 
 
 
@@ -16,20 +16,22 @@ input =
 
 main =
     parse input
-        |> iterate 5 0
-        |> Array.get 0
+        |> iterate 2 (RelativeBase 0) 0
+        |> Tuple.second
+        |> Dict.get 0
         |> Maybe.map String.fromInt
         |> Maybe.withDefault "error"
         |> text
 
 
-parse : String -> Array Int
+parse : String -> Dict Int Int
 parse stringValues =
     String.split "," stringValues
         |> List.filter (String.isBlank >> not)
         |> List.map String.toInt
         |> List.map (Maybe.withDefault 0)
-        |> Array.fromList
+        |> List.indexedMap Tuple.pair
+        |> Dict.fromList
 
 
 type Instruction
@@ -41,23 +43,30 @@ type Instruction
     | JumpIfFalseInstruction Int Int
     | LessThanInstruction Int Int Int
     | EqualsInstruction Int Int Int
+    | AdjustRelativeBaseInstruction Int
     | HaltInstruction
 
 
 type Mode
     = Immediate
     | Position
+    | Relative
+
+
+type RelativeBase
+    = RelativeBase Int
 
 
 type Opcode
-    = Add Mode Mode
-    | Multiply Mode Mode
-    | Input
+    = Add Mode Mode Mode
+    | Multiply Mode Mode Mode
+    | Input Mode
     | Output Mode
     | JumpIfTrue Mode Mode
     | JumpIfFalse Mode Mode
-    | LessThan Mode Mode
-    | Equals Mode Mode
+    | LessThan Mode Mode Mode
+    | Equals Mode Mode Mode
+    | AdjustRelativeBase Mode
     | Halt
 
 
@@ -72,16 +81,19 @@ getOpcode instruction =
 
         mode2 =
             instruction // 1000 |> modBy 10 |> intToMode
+
+        mode3 =
+            instruction // 10000 |> modBy 10 |> intToMode
     in
     case opcodeValue of
         1 ->
-            Add mode1 mode2
+            Add mode1 mode2 mode3
 
         2 ->
-            Multiply mode1 mode2
+            Multiply mode1 mode2 mode3
 
         3 ->
-            Input
+            Input mode1
 
         4 ->
             Output mode1
@@ -93,10 +105,13 @@ getOpcode instruction =
             JumpIfFalse mode1 mode2
 
         7 ->
-            LessThan mode1 mode2
+            LessThan mode1 mode2 mode3
 
         8 ->
-            Equals mode1 mode2
+            Equals mode1 mode2 mode3
+
+        9 ->
+            AdjustRelativeBase mode1
 
         99 ->
             Halt
@@ -114,136 +129,224 @@ intToMode int =
         1 ->
             Immediate
 
+        2 ->
+            Relative
+
         _ ->
             Debug.todo ("Invalid mode value " ++ String.fromInt int)
 
 
-modeToValue : Array Int -> Mode -> Int -> Int
-modeToValue list mode parameter =
+modeToValue : RelativeBase -> Dict Int Int -> Mode -> Int -> Int
+modeToValue (RelativeBase relativeBase) list mode parameter =
     case mode of
         Immediate ->
             parameter
 
         Position ->
-            Array.get parameter list
-                |> Maybe.withDefault 0
+            Dict.get parameter list |> Maybe.withDefault 0
+
+        Relative ->
+            Dict.get (relativeBase + parameter) list |> Maybe.withDefault 0
 
 
-iterate : Int -> Int -> Array Int -> Array Int
-iterate givenInput index list =
+iterate : Int -> RelativeBase -> Int -> Dict Int Int -> ( RelativeBase, Dict Int Int )
+iterate givenInput relativeBase index list =
     let
         codeMaybe =
-            Array.get index list
+            Dict.get index list
 
-        instructionMaybe =
+        instruction =
             Maybe.map getOpcode codeMaybe
-                |> Maybe.andThen (getInstruction index list)
+                |> Maybe.map (getInstruction relativeBase index list)
+                |> unsafeMaybe "Unable to get instruction"
     in
-    case instructionMaybe of
-        Just instruction ->
-            case instruction of
-                AddInstruction first second position ->
-                    Array.set position (first + second) list
-                        |> iterate givenInput (index + 4)
+    case instruction of
+        AddInstruction first second position ->
+            Dict.insert position (first + second) list
+                |> iterate givenInput relativeBase (index + 4)
 
-                MultiplyInstruction first second position ->
-                    Array.set position (first * second) list
-                        |> iterate givenInput (index + 4)
+        MultiplyInstruction first second position ->
+            Dict.insert position (first * second) list
+                |> iterate givenInput relativeBase (index + 4)
 
-                HaltInstruction ->
-                    list
+        HaltInstruction ->
+            ( relativeBase, list )
 
-                InputInstruction position ->
-                    Array.set position givenInput list
-                        |> iterate givenInput (index + 2)
+        InputInstruction position ->
+            Dict.insert position givenInput list
+                |> iterate givenInput relativeBase (index + 2)
 
-                OutputInstruction value ->
-                    let
-                        _ =
-                            Debug.log "Output: " value
-                    in
-                    iterate givenInput (index + 2) list
+        OutputInstruction value ->
+            let
+                _ =
+                    Debug.log "Output: " value
+            in
+            iterate givenInput relativeBase (index + 2) list
 
-                JumpIfTrueInstruction value position ->
+        JumpIfTrueInstruction value position ->
+            let
+                newIndex =
                     if value /= 0 then
-                        iterate givenInput position list
+                        position
 
                     else
-                        iterate givenInput (index + 3) list
+                        index + 3
+            in
+            iterate givenInput relativeBase newIndex list
 
-                JumpIfFalseInstruction value position ->
+        JumpIfFalseInstruction value position ->
+            let
+                newIndex =
                     if value == 0 then
-                        iterate givenInput position list
+                        position
 
                     else
-                        iterate givenInput (index + 3) list
+                        index + 3
+            in
+            iterate givenInput relativeBase newIndex list
 
-                LessThanInstruction value1 value2 position ->
-                    let
-                        result =
-                            if value1 < value2 then
-                                1
+        LessThanInstruction value1 value2 position ->
+            let
+                result =
+                    if value1 < value2 then
+                        1
 
-                            else
-                                0
-                    in
-                    Array.set position result list
-                        |> iterate givenInput (index + 4)
+                    else
+                        0
+            in
+            Dict.insert position result list
+                |> iterate givenInput relativeBase (index + 4)
 
-                EqualsInstruction value1 value2 position ->
-                    let
-                        result =
-                            if value1 == value2 then
-                                1
+        EqualsInstruction value1 value2 position ->
+            let
+                result =
+                    if value1 == value2 then
+                        1
 
-                            else
-                                0
-                    in
-                    Array.set position result list
-                        |> iterate givenInput (index + 4)
+                    else
+                        0
+            in
+            Dict.insert position result list
+                |> iterate givenInput relativeBase (index + 4)
 
-        Nothing ->
-            list
+        AdjustRelativeBaseInstruction value ->
+            let
+                relativeBaseValue =
+                    case relativeBase of
+                        RelativeBase relativeBaseValue_ ->
+                            relativeBaseValue_
+            in
+            iterate givenInput (RelativeBase (relativeBaseValue + value)) (index + 2) list
 
 
-getInstruction index list opcode =
+getInstruction : RelativeBase -> Int -> Dict Int Int -> Opcode -> Instruction
+getInstruction relativeBase index list opcode =
     let
         firstMaybe =
-            Array.get (index + 1) list
+            Dict.get (index + 1) list
 
         secondMaybe =
-            Array.get (index + 2) list
+            Dict.get (index + 2) list
 
         thirdMaybe =
-            Array.get (index + 3) list
+            Dict.get (index + 3) list
 
-        toValue mode =
-            Maybe.map (modeToValue list mode)
+        toValue currentRelativeBase mode maybeParameter =
+            case maybeParameter of
+                Just parameter ->
+                    modeToValue currentRelativeBase list mode parameter
+
+                Nothing ->
+                    Debug.todo "Parameter not found"
+
+        positionToValue (RelativeBase currentRelativeBase) mode maybeParameter =
+            case maybeParameter of
+                Just parameter ->
+                    case mode of
+                        Position ->
+                            parameter
+
+                        Relative ->
+                            currentRelativeBase + parameter
+
+                        Immediate ->
+                            Debug.todo "Position cannot be in Immediate mode"
+
+                Nothing ->
+                    Debug.todo "Parameter not found"
     in
     case opcode of
-        Add mode1 mode2 ->
-            Maybe.map3 AddInstruction (toValue mode1 firstMaybe) (toValue mode2 secondMaybe) thirdMaybe
+        Add mode1 mode2 mode3 ->
+            let
+                value1 =
+                    toValue relativeBase mode1 firstMaybe
 
-        Multiply mode1 mode2 ->
-            Maybe.map3 MultiplyInstruction (toValue mode1 firstMaybe) (toValue mode2 secondMaybe) thirdMaybe
+                value2 =
+                    toValue relativeBase mode2 secondMaybe
+
+                position =
+                    positionToValue relativeBase mode3 thirdMaybe
+            in
+            AddInstruction value1 value2 position
+
+        Multiply mode1 mode2 mode3 ->
+            let
+                value1 =
+                    toValue relativeBase mode1 firstMaybe
+
+                value2 =
+                    toValue relativeBase mode2 secondMaybe
+
+                position =
+                    positionToValue relativeBase mode3 thirdMaybe
+            in
+            MultiplyInstruction value1 value2 position
 
         Halt ->
-            Just HaltInstruction
+            HaltInstruction
 
-        Input ->
-            Maybe.map InputInstruction firstMaybe
+        Input mode ->
+            InputInstruction (positionToValue relativeBase mode firstMaybe)
 
         Output mode ->
-            Maybe.map OutputInstruction (toValue mode firstMaybe)
+            OutputInstruction (toValue relativeBase mode firstMaybe)
 
         JumpIfTrue mode1 mode2 ->
-            Maybe.map2 JumpIfTrueInstruction (toValue mode1 firstMaybe) (toValue mode2 secondMaybe)
+            let
+                value1 =
+                    toValue relativeBase mode1 firstMaybe
+
+                value2 =
+                    toValue relativeBase mode2 secondMaybe
+            in
+            JumpIfTrueInstruction value1 value2
 
         JumpIfFalse mode1 mode2 ->
-            Maybe.map2 JumpIfFalseInstruction (toValue mode1 firstMaybe) (toValue mode2 secondMaybe)
+            JumpIfFalseInstruction
+                (toValue relativeBase mode1 firstMaybe)
+                (toValue relativeBase mode2 secondMaybe)
 
-        LessThan mode1 mode2 ->
-            Maybe.map3 LessThanInstruction (toValue mode1 firstMaybe) (toValue mode2 secondMaybe) thirdMaybe
+        LessThan mode1 mode2 mode3 ->
+            LessThanInstruction
+                (toValue relativeBase mode1 firstMaybe)
+                (toValue relativeBase mode2 secondMaybe)
+                (positionToValue relativeBase mode3 thirdMaybe)
 
-        Equals mode1 mode2 ->
-            Maybe.map3 EqualsInstruction (toValue mode1 firstMaybe) (toValue mode2 secondMaybe) thirdMaybe
+        Equals mode1 mode2 mode3 ->
+            EqualsInstruction
+                (toValue relativeBase mode1 firstMaybe)
+                (toValue relativeBase mode2 secondMaybe)
+                (positionToValue relativeBase mode3 thirdMaybe)
+
+        AdjustRelativeBase mode ->
+            AdjustRelativeBaseInstruction (toValue relativeBase mode firstMaybe)
+
+
+unsafeMaybe : String -> Maybe a -> a
+unsafeMaybe error maybe =
+    case maybe of
+        Just value ->
+            value
+
+        Nothing ->
+            Debug.todo error

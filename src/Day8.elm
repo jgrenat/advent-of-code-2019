@@ -32,7 +32,7 @@ findStep2 =
     List.transpose parsed
         |> List.map (List.find ((/=) 2) >> Maybe.withDefault 0)
         |> List.groupsOf 25
-        |> List.map (List.map (\value -> div [ style "width" "5px", style "height" "5px", style "background-color" (getColor value) ] []))
+        |> List.map (List.map (\value -> div [ style "width" "10px", style "height" "10px", style "background-color" (getColor value) ] []))
         |> List.map (div [ style "display" "flex" ])
         |> div []
 
