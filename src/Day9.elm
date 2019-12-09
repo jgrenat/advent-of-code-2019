@@ -162,19 +162,16 @@ iterate givenInput relativeBase index list =
     in
     case instruction of
         AddInstruction first second position ->
-            Dict.insert position (first + second) list
-                |> iterate givenInput relativeBase (index + 4)
+            iterate givenInput relativeBase (index + 4) (Dict.insert position (first + second) list)
 
         MultiplyInstruction first second position ->
-            Dict.insert position (first * second) list
-                |> iterate givenInput relativeBase (index + 4)
+            iterate givenInput relativeBase (index + 4) (Dict.insert position (first * second) list)
 
         HaltInstruction ->
             ( relativeBase, list )
 
         InputInstruction position ->
-            Dict.insert position givenInput list
-                |> iterate givenInput relativeBase (index + 2)
+            iterate givenInput relativeBase (index + 2) (Dict.insert position givenInput list)
 
         OutputInstruction value ->
             let
@@ -214,8 +211,7 @@ iterate givenInput relativeBase index list =
                     else
                         0
             in
-            Dict.insert position result list
-                |> iterate givenInput relativeBase (index + 4)
+            iterate givenInput relativeBase (index + 4) (Dict.insert position result list)
 
         EqualsInstruction value1 value2 position ->
             let
@@ -226,8 +222,7 @@ iterate givenInput relativeBase index list =
                     else
                         0
             in
-            Dict.insert position result list
-                |> iterate givenInput relativeBase (index + 4)
+            iterate givenInput relativeBase (index + 4) (Dict.insert position result list)
 
         AdjustRelativeBaseInstruction value ->
             let
