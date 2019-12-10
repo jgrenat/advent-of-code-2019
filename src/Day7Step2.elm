@@ -56,7 +56,7 @@ type GlobalStatus
 tryWithPermutation : Array Int -> List Int -> Output
 tryWithPermutation instructions phaseSettings =
     feedbackLoop
-        (phaseSettings |> List.map (\phaseSetting -> ( instructions, 0, Just phaseSetting )))
+        (List.map (\phaseSetting -> ( instructions, 0, Just phaseSetting )) phaseSettings)
         0
         |> iterateGlobally
 
@@ -107,8 +107,7 @@ iterateGlobally status =
                     List.map (\( instructions, index ) -> ( instructions, index, Nothing )) states
                         |> List.reverse
             in
-            feedbackLoop augmentedStates output
-                |> iterateGlobally
+            iterateGlobally (feedbackLoop augmentedStates output)
 
 
 type Instruction
