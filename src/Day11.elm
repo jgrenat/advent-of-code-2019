@@ -3,7 +3,6 @@ module Day11 exposing (..)
 import Dict exposing (Dict)
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (style)
-import List.Extra as List
 import Set exposing (Set)
 import String.Extra as String
 
